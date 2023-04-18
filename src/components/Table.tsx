@@ -98,7 +98,7 @@ const Table = ({ data, dynamicColumns, title, loading }: tableProps) => {
         width: "100%",
       }}
     >
-      <Box display={"flex"} padding={"8px"} mt={"32px"}>
+      <Box display={"flex"} padding={"8px"}>
         <HeadingTwo flexBasis={"100%"} textAlign={"center"}>
           {title}
         </HeadingTwo>

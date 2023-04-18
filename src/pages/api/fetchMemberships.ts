@@ -11,7 +11,8 @@ const authToken = process.env.STAFF_AUTH_TOKEN;
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     try {
-      const fetchedMemberships = await Axios.get("site/memberships");
+      const authToken = req.headers.authorization;
+      const fetchedMemberships = await Axios.get("site/memberships", { headers: { Authorization: authToken } });
       const memberships = fetchedMemberships.data.Memberships;
 
       const modifiedMemberships = memberships.map((membership: any) => {
@@ -27,9 +28,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const successResponse = success(200, "Fetched Memeberships", modifiedMemberships);
       res.status(successResponse.status).json(successResponse);
-    } catch (err) {
-      console.log("Error getting clients", err);
-      const errorResponse = error(500, "Error getting clients", err);
+    } catch (err: any) {
+      console.log("Error getting clients", err?.message, err);
+      const errorResponse = error(500, err?.message ?? "Error getting clients", err);
       res.status(errorResponse.status).json(errorResponse);
     }
   }

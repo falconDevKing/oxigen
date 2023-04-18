@@ -9,17 +9,21 @@ const siteId = process.env.SITE_ID;
 const authToken = process.env.STAFF_AUTH_TOKEN;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === "POST") {
-    const { clientId } = req.body;
+  if (req.method === "GET") {
     try {
+      const authToken = req.headers.authorization;
+      const { clientsIds } = req.query;
+      const clientIdsArray = (clientsIds as string).split(",");
+
       const offsetMax = 200;
       let offsetValue = 0;
 
-      let memberships: any[] = [];
+      let clientsMembershipsObjectsArray: any[] = [];
 
       const fetchMembershipsData = async () => {
-        const fetchedClientsMemberships = await Axios.get("client/activeclientmemberships", {
-          params: { limit: 200, offset: offsetValue, clientId: clientId },
+        const fetchedClientsMemberships = await Axios.get("client/activeclientsmemberships", {
+          params: { limit: 200, offset: offsetValue, clientIds: clientIdsArray },
+          headers: { Authorization: authToken },
         });
         const clientMemberships = fetchedClientsMemberships.data.ClientMemberships;
         const requestedOffset = fetchedClientsMemberships.data.PaginationResponse.RequestedOffset;
@@ -27,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const nextOffset = requestedOffset + pageSize;
         const totalResultSize = fetchedClientsMemberships.data.PaginationResponse.TotalResults;
 
-        memberships = [...memberships, ...clientMemberships];
+        clientsMembershipsObjectsArray = [...clientsMembershipsObjectsArray, ...clientMemberships]; // [m,m] // [{m},{m}]
 
         if (nextOffset < totalResultSize) {
           offsetValue = nextOffset;
@@ -37,21 +41,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       await fetchMembershipsData();
 
-      const getUniqueMembershipCodes = () => {
-        const membershipsIds: number[] = memberships.map((membership) => membership.MembershipId);
+      const getUniqueMembershipCodes = (membershipsArray: any[]) => {
+        const membershipsIds: number[] = membershipsArray.map((membership) => membership.MembershipId);
 
         const uniqueMembershipIds = Array.from(new Set(membershipsIds));
         return uniqueMembershipIds;
       };
 
-      const uniqueMembershipIds = getUniqueMembershipCodes();
+      const clientsMembershipsIdsArray = clientsMembershipsObjectsArray
+        .map((clientsMembershipsObject) => getUniqueMembershipCodes(clientsMembershipsObject.Memberships))
+        .flat();
 
       // const successResponse = success(200, "FetchClientsMemberships", { memberships, uniqueMembershipIds });
-      const successResponse = success(200, "FetchClientsMemberships", uniqueMembershipIds);
+      const successResponse = success(200, "FetchClientsMemberships", clientsMembershipsIdsArray);
       res.status(successResponse.status).json(successResponse);
-    } catch (err) {
-      console.log("Error getting clientsMemberships", err);
-      const errorResponse = error(500, "Error getting clientsMemberships", err);
+    } catch (err: any) {
+      console.log("Error getting clientsMemberships", err?.message, err);
+      const errorResponse = error(500, err?.message ?? "Error getting clientsMemberships", err);
       res.status(errorResponse.status).json(errorResponse);
     }
   }

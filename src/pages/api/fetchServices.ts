@@ -10,12 +10,16 @@ const authToken = process.env.STAFF_AUTH_TOKEN;
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     try {
+      const authToken = req.headers.authorization;
       let offsetValue = 0;
 
       let servicesData: any[] = [];
 
       const fetchServicesData = async () => {
-        const fetchedServicesDataSet = await Axios.get("sale/services", { params: { limit: 200, offset: offsetValue, includeDiscontinued: false } });
+        const fetchedServicesDataSet = await Axios.get("sale/services", {
+          params: { limit: 200, offset: offsetValue, includeDiscontinued: false },
+          headers: { Authorization: authToken },
+        });
         const services = fetchedServicesDataSet.data.Services;
         const requestedOffset = fetchedServicesDataSet.data.PaginationResponse.RequestedOffset;
         const pageSize = fetchedServicesDataSet.data.PaginationResponse.PageSize;
@@ -34,9 +38,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const successResponse = success(200, "FetchServices", servicesData);
       res.status(successResponse.status).json(successResponse);
-    } catch (err) {
-      console.log("Error getting services", err);
-      const errorResponse = error(500, "Error getting services", err);
+    } catch (err: any) {
+      console.log("Error getting services", err?.message, err);
+      const errorResponse = error(500, err?.message ?? "Error getting services", err);
       res.status(errorResponse.status).json(errorResponse);
     }
   }

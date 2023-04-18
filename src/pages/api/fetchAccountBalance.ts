@@ -10,10 +10,9 @@ const authToken = process.env.STAFF_AUTH_TOKEN;
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     try {
+      const authToken = req.headers.authorization;
       const { clientsIds, balanceDate } = req.query;
-      console.log("cleintsIds", clientsIds);
       const clientIdsArray = (clientsIds as string).split(",");
-      console.log("clientIdsArray", clientIdsArray);
 
       let offsetValue = 0;
 
@@ -22,6 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const fetchAccountBalanceData = async () => {
         const fetchedAccountBalanceDataSet = await Axios.get("client/clientaccountbalances", {
           params: { limit: 200, offset: offsetValue, balanceDate, clientIds: clientIdsArray },
+          headers: { Authorization: authToken },
         });
         const accountBalance = fetchedAccountBalanceDataSet.data.Clients;
         const requestedOffset = fetchedAccountBalanceDataSet.data.PaginationResponse.RequestedOffset;
@@ -42,9 +42,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // const successResponse = success(200, "FetchAccountBalance", []);
       const successResponse = success(200, "FetchAccountBalance", accountBalanceData);
       res.status(successResponse.status).json(successResponse);
-    } catch (err) {
-      console.log("Error getting AccountBalance", err);
-      const errorResponse = error(500, "Error getting AccountBalance", err);
+    } catch (err: any) {
+      console.log("Error getting AccountBalance", err?.message, err);
+      const errorResponse = error(500, err?.message ?? "Error getting AccountBalance", err);
       res.status(errorResponse.status).json(errorResponse);
     }
   }

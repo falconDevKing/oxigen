@@ -2,23 +2,12 @@ import Axios from "utils/axiosInstance";
 import axios from "axios";
 import { success, error } from "utils/responseFormat";
 import { DataGrid, GridColDef, GridRenderCellParams, GridRowSelectionModel, GridValueGetterParams } from "@mui/x-data-grid";
-
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-const apiKey = process.env.NEXT_PUBLIC_API_KEY;
-const siteId = process.env.NEXT_PUBLIC_SITE_ID;
-const authToken = process.env.NEXT_PUBLIC_STAFF_AUTH_TOKEN;
+import { getAuthTokenStorage } from "utils/getAuthToken";
 
 export type numberObject = { [x: string]: number };
 export type stringObject = { [x: string]: string };
 export type simpleObject = { [x: string]: string | number };
 export type complexObject = { [x: string]: any };
-
-export const getActiveClientsUniqueMembershipIds = async (clientId: string) => {
-  const getActiveClientMembershipsIds = await axios.post("/api/fetchActiveClientMemberships", { clientId: clientId });
-  const activeClientMembershipsIds: number[] = getActiveClientMembershipsIds.data.data;
-
-  return activeClientMembershipsIds;
-};
 
 const getActiveMembership = (activeClientsMemberships: number[], membershipsData: any[]) => {
   const uniqueMemberships = Array.from(new Set(activeClientsMemberships));
@@ -37,23 +26,27 @@ const getGenericFigures = (clients: any[]) => {
   let expired = 0;
   let suspended = 0;
   let terminated = 0;
+  let nonMember = 0;
 
   clients.forEach((client) => {
     if (client.Status === "Terminated") {
-      terminated = +1;
+      terminated += 1;
     }
     if (client.Status === "Expired") {
-      expired = +1;
+      expired += 1;
     }
     if (client.Status === "Suspended") {
-      suspended = +1;
+      suspended += 1;
     }
     if (client.Status === "Declined") {
-      declined = +1;
+      declined += 1;
+    }
+    if (client.Status === "Non-Member") {
+      nonMember += 1;
     }
   });
 
-  return { declined, expired, suspended, terminated };
+  return { declined, expired, suspended, terminated, nonMember };
 };
 
 export const createMembershipTableData = (clientsData: any[], membershipsData: any[], activeClientsMemberships: number[]) => {
@@ -72,13 +65,19 @@ export const createMembershipTableData = (clientsData: any[], membershipsData: a
     {
       field: "month",
       headerName: "Monthly",
-      width: 300,
+      width: 150,
       editable: false,
     },
     ...dynamicGridColumns,
     {
       field: "declined",
       headerName: "Declined",
+      width: 150,
+      editable: false,
+    },
+    {
+      field: "expired",
+      headerName: "Expired",
       width: 150,
       editable: false,
     },
@@ -94,6 +93,12 @@ export const createMembershipTableData = (clientsData: any[], membershipsData: a
       width: 150,
       editable: false,
     },
+    {
+      field: "nonMember",
+      headerName: "Non-Member",
+      width: 150,
+      editable: false,
+    },
   ];
 
   const initialRowObject: simpleObject = {
@@ -106,6 +111,6 @@ export const createMembershipTableData = (clientsData: any[], membershipsData: a
 
   return {
     columnsData: membershipColumns,
-    rowsData: updatedRowObject,
+    rowsData: [updatedRowObject],
   };
 };

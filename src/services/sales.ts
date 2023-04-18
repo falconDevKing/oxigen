@@ -4,7 +4,7 @@ import { DataGrid, GridColDef, GridRenderCellParams, GridRowSelectionModel, Grid
 import moment from "moment";
 
 const filterServicesSales = (salesData: any[]) => {
-  const purchasedServicesItems: any[] = salesData.reduce((accumulator, currentValue) => {
+  const purchasedServicesItems: any[] = salesData?.reduce((accumulator, currentValue) => {
     const added: any[] = [];
     const purchasedItemsArray: any[] = currentValue.PurchasedItems;
     purchasedItemsArray.forEach((purchasedItem) => {
@@ -46,7 +46,7 @@ const groupBy = (objectArray: any[], property: string) => {
 };
 
 const createPeriodicSalesByServices = (salesData: any[], servicesData: any[], startDate: string) => {
-  const purchasedServicesItems = filterServicesSales(salesData);
+  const purchasedServicesItems = filterServicesSales(salesData ?? []);
 
   const groupedPurchaseServicesItems: complexObject = groupBy(purchasedServicesItems, "id");
 
@@ -87,14 +87,14 @@ const createPeriodicSalesByServices = (salesData: any[], servicesData: any[], st
   };
 };
 
-export type salesPeriod = {
+export type period = {
   a: string;
   b: string;
 };
 
-export const createSalesByServices = (salesData: any[], servicesData: any[], salesPeriod: salesPeriod[]) => {
+export const createSalesByServices = (salesData: any[], servicesData: any[], period: period[]) => {
   const salesTableData = salesData.map((saleData, index) => {
-    const saleDataResult = createPeriodicSalesByServices(saleData, servicesData, salesPeriod[index].a);
+    const saleDataResult = createPeriodicSalesByServices(saleData, servicesData, period[index].a);
     return saleDataResult;
   });
 
@@ -126,7 +126,7 @@ export const createSalesByServices = (salesData: any[], servicesData: any[], sal
       headerName: "Uncategorised",
       width: 200,
       editable: false,
-      valueGetter: (params: GridValueGetterParams) => `$${Number(params.row.Uncategorised).toFixed(2)}`,
+      valueGetter: (params: GridValueGetterParams) => (Number(params.row["Uncategorised"]) ? `$${Number(params.row["Uncategorised"]).toFixed(2)}` : "$0.00"),
     },
     {
       field: "incomeExTax",

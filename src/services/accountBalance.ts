@@ -1,10 +1,10 @@
 import { simpleObject } from "./memberships";
 import { DataGrid, GridColDef, GridRenderCellParams, GridRowSelectionModel, GridValueGetterParams } from "@mui/x-data-grid";
-import { salesPeriod } from "./sales";
+import { period } from "./sales";
 import moment from "moment";
 
 export const createAccountPeriodBalance = (clientsData: any[], salesMonth: string) => {
-  const arrearsBalance = clientsData.reduce((accumulator, currentValue) => {
+  const arrearsBalance = (clientsData ?? []).reduce((accumulator, currentValue) => {
     if (currentValue.AccountBalance >= 0) {
       return accumulator + 0;
     } else {
@@ -20,9 +20,9 @@ export const createAccountPeriodBalance = (clientsData: any[], salesMonth: strin
   return initialRowObject;
 };
 
-export const createAccountBalance = (clientsData: any[], salePeriod: salesPeriod[]) => {
+export const createAccountBalance = (clientsData: any[], intervals: period[]) => {
   const clientsTableData = clientsData.map((clientData, index) => {
-    const clientDataResult = createAccountPeriodBalance(clientData, salePeriod[index].a);
+    const clientDataResult = createAccountPeriodBalance(clientData, intervals[index].a);
     return clientDataResult;
   });
 
@@ -36,7 +36,7 @@ export const createAccountBalance = (clientsData: any[], salePeriod: salesPeriod
     {
       field: "accountBalance",
       headerName: "Account Balance (Arrears)",
-      width: 250,
+      width: 200,
       editable: false,
       valueGetter: (params: GridValueGetterParams) => `$${Number(params.row.accountBalance * -1).toFixed(2)}`,
       align: "right",
