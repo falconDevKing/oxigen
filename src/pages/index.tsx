@@ -347,10 +347,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     props: {
       authToken: authToken,
       clientsData: clientsProps,
-      membershipsData: [],
-      servicesData: [],
-      // membershipsData: membershipsProps,
-      // servicesData: servicesProps,
+      membershipsData: membershipsProps,
+      servicesData: servicesProps,
     },
   };
 };
