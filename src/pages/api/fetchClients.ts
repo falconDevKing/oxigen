@@ -19,8 +19,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       let clientData: any[] = [];
 
       const fetchclientData = async () => {
-        const fetchedClientsDataSet = await Axios.get("client/clients", { params: { limit: 100, offset: offsetValue }, headers: { Authorization: authToken } });
         // const fetchedClientsDataSet = await Axios.get("client/clients", { params: { limit: 200, offset: offsetValue } });
+        const fetchedClientsDataSet = await Axios.get("client/clients", { params: { limit: 200, offset: offsetValue }, headers: { Authorization: authToken } });
         const clients = fetchedClientsDataSet.data.Clients;
         const requestedOffset = fetchedClientsDataSet.data.PaginationResponse.RequestedOffset;
         const pageSize = fetchedClientsDataSet.data.PaginationResponse.PageSize;
@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         clientData = [...clientData, ...clients];
 
         // if (nextOffset < totalResultSize) {
-        if (nextOffset < 100) {
+        if (nextOffset < 200) {
           offsetValue = nextOffset;
           await fetchclientData();
         }

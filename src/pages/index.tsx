@@ -217,10 +217,10 @@ const Home = (props: { authToken: string; clientsData: any[]; membershipsData: a
       }
     };
 
-    // getCombinedActiveClientsUniqueMembershipIds();
-    // getSalesData();
-    // getAccountBalanceData();
-    // getCombinedClientsContracts();
+    getCombinedActiveClientsUniqueMembershipIds();
+    getSalesData();
+    getAccountBalanceData();
+    getCombinedClientsContracts();
   }, [authToken, clientsData, intervals]);
 
   return (
@@ -286,6 +286,8 @@ const Home = (props: { authToken: string; clientsData: any[]; membershipsData: a
 export default Home;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const serverUrl = process.env.SERVER_URL;
+
   const authTokenData = await axios.post(
     "https://api.mindbodyonline.com/public/v6/usertoken/issue",
     {
@@ -294,14 +296,12 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     },
     { headers: { "Content-Type": "application/json", "API-Key": apiKey, siteId: siteId } }
   );
-
   const authToken = "Bearer " + authTokenData.data.AccessToken;
-  console.log("ssrauth", authToken);
 
   const getClientsData = async () => {
     try {
       console.log("getClientscalled");
-      const getClients = await axios.get("http://localhost:3000/api/fetchClients", {
+      const getClients = await axios.get(serverUrl + "/api/fetchClients", {
         headers: { Authorization: authToken },
       });
       const clientsData = getClients?.data?.data;
@@ -311,38 +311,37 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     }
   };
 
-  // const getMembershipsData = async () => {
-  //   try {
-  //     console.log("getMembershipscalled");
-  //     const getMemberships = await axios.get("http://localhost:3000/api/fetchMemberships", {
-  //       headers: { Authorization: authToken },
-  //     });
-  //     const membershipsData = getMemberships?.data?.data;
-  //     return membershipsData;
-  //   } catch (err) {
-  //     console.log("Membership Error:", err);
-  //   }
-  // };
+  const getMembershipsData = async () => {
+    try {
+      console.log("getMembershipscalled");
+      const getMemberships = await axios.get(serverUrl + "/api/fetchMemberships", {
+        headers: { Authorization: authToken },
+      });
+      const membershipsData = getMemberships?.data?.data;
+      return membershipsData;
+    } catch (err) {
+      console.log("Membership Error:", err);
+    }
+  };
 
-  // const getServicesData = async () => {
-  //   try {
-  //     console.log("getServicescalled");
-  //     const getServices = await axios.get("http://localhost:3000/api/fetchServices", {
-  //       headers: { Authorization: authToken },
-  //     });
-  //     const servicesData = getServices?.data?.data;
-  //     return servicesData;
-  //   } catch (err) {
-  //     console.log("Services Error:", err);
-  //   }
-  // };
+  const getServicesData = async () => {
+    try {
+      console.log("getServicescalled");
+      const getServices = await axios.get(serverUrl + "/api/fetchServices", {
+        headers: { Authorization: authToken },
+      });
+      const servicesData = getServices?.data?.data;
+      return servicesData;
+    } catch (err) {
+      console.log("Services Error:", err);
+    }
+  };
 
-  // const [clientsData, membershipsData, servicesData] = await Promise.allSettled([getClientsData(), getMembershipsData(), getServicesData()]);
-  const [clientsData] = await Promise.allSettled([getClientsData()]);
+  const [clientsData, membershipsData, servicesData] = await Promise.allSettled([getClientsData(), getMembershipsData(), getServicesData()]);
 
   const clientsProps = clientsData.status === "fulfilled" ? clientsData.value : [];
-  // const membershipsProps = membershipsData.status === "fulfilled" ? membershipsData.value : [];
-  // const servicesProps = servicesData.status === "fulfilled" ? servicesData.value : [];
+  const membershipsProps = membershipsData.status === "fulfilled" ? membershipsData.value : [];
+  const servicesProps = servicesData.status === "fulfilled" ? servicesData.value : [];
 
   return {
     props: {
