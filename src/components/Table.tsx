@@ -30,9 +30,10 @@ type tableProps = {
   data: simpleObject[];
   dynamicColumns: GridColDef[];
   title: string;
+  loading?: boolean;
 };
 
-const Table = ({ data, dynamicColumns, title }: tableProps) => {
+const Table = ({ data, dynamicColumns, title, loading }: tableProps) => {
   // const [openModal, setOpenModal] = React.useState<boolean>(false);
   // const [modalData, setModalData] = React.useState<any[]>([]);
   const [selectedData, setSelectedData] = React.useState<any[]>([]);
@@ -93,7 +94,7 @@ const Table = ({ data, dynamicColumns, title }: tableProps) => {
     <Box
       py={4}
       sx={{
-        height: "400px",
+        height: "500px",
         width: "100%",
       }}
     >
@@ -106,14 +107,15 @@ const Table = ({ data, dynamicColumns, title }: tableProps) => {
         columns={dynamicColumns}
         rows={data}
         getRowId={(row) => row.month}
+        loading={loading}
         initialState={{
           pagination: {
             paginationModel: {
-              pageSize: 5,
+              pageSize: 6,
             },
           },
         }}
-        pageSizeOptions={[5, 10]}
+        pageSizeOptions={[6, 12]}
         checkboxSelection
         disableRowSelectionOnClick
         onRowSelectionModelChange={(rowSelectionModel: GridRowSelectionModel) => {

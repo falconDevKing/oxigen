@@ -8,7 +8,10 @@ const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 const siteId = process.env.NEXT_PUBLIC_SITE_ID;
 const authToken = process.env.NEXT_PUBLIC_STAFF_AUTH_TOKEN;
 
+export type numberObject = { [x: string]: number };
+export type stringObject = { [x: string]: string };
 export type simpleObject = { [x: string]: string | number };
+export type complexObject = { [x: string]: any };
 
 export const getActiveClientsUniqueMembershipIds = async (clientId: string) => {
   const getActiveClientMembershipsIds = await axios.post("/api/fetchActiveClientMemberships", { clientId: clientId });

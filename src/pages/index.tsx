@@ -16,6 +16,8 @@ import Table from "components/Table";
 import axios from "axios";
 import { createMembershipTableData, getActiveClientsUniqueMembershipIds, simpleObject } from "services/memberships";
 import { createAccountBalance } from "services/accountBalance";
+import { createSalesByServices } from "services/sales";
+import moment from "moment";
 
 type filesData = {
   id: string;
@@ -34,7 +36,19 @@ const Home = (props: homeProps) => {
   const classes = useStyles();
   const [clientsData, setClientsData] = useState<any[]>([]);
   const [membershipsData, setMembershipsData] = useState<any[]>([]);
+  const [salesLoading, setSalesLoading] = useState<boolean>(false);
+  const [salesData, setSalesData] = useState<any[]>([]);
+  const [servicesData, setServicesData] = useState<any[]>([]);
   const [activeClientsMemberships, setActiveClientsMemberships] = useState<number[]>([]);
+
+  const formatString = "YYYY-MM-DDThh:mm:ss[Z]";
+  const one = moment().startOf("month").subtract(6, "months").format(formatString);
+  const two = moment().startOf("month").subtract(5, "months").format(formatString);
+  const three = moment().startOf("month").subtract(4, "months").format(formatString);
+  const four = moment().startOf("month").subtract(3, "months").format(formatString);
+  const five = moment().startOf("month").subtract(2, "months").format(formatString);
+  const six = moment().startOf("month").subtract(1, "months").format(formatString);
+  const seven = moment().startOf("month").format(formatString);
 
   const getClientsData = async () => {
     try {
@@ -60,6 +74,62 @@ const Home = (props: homeProps) => {
     }
   };
 
+  const salesPeriod = [
+    { a: one, b: two },
+    { a: two, b: three },
+    { a: three, b: four },
+    { a: four, b: five },
+    { a: five, b: six },
+    { a: six, b: seven },
+  ];
+
+  const getSalesPeriodData = async (a: string, b: string) => {
+    try {
+      const getPeriodSales = await axios.get("/api/fetchSales", {
+        params: {
+          startSaleDateTime: a,
+          endSaleDateTime: b,
+        },
+      });
+      const salesPeriodData = getPeriodSales.data.data;
+      return salesPeriodData;
+    } catch (err) {
+      console.log("Sales Period Error:", err);
+      ErrorHandler({ message: "Error fetching Sales Period" });
+    }
+  };
+
+  const getSalesData = async () => {
+    try {
+      setSalesLoading(true);
+      const combinedSalesData = await Promise.allSettled(
+        salesPeriod.map(async (salePeriod) => {
+          const salePeriodData = await getSalesPeriodData(salePeriod.a, salePeriod.b);
+          return salePeriodData;
+        })
+      );
+      const combinedSalesDataValues = combinedSalesData.map((value) => value?.value ?? []);
+      setSalesData(combinedSalesDataValues);
+      SuccessHandler({ message: "Fetched Sales" });
+      setSalesLoading(false);
+    } catch (err) {
+      console.log("Sales Error:", err);
+      ErrorHandler({ message: "Error fetching Sales" });
+    }
+  };
+
+  const getServicesData = async () => {
+    try {
+      const getServices = await axios.get("/api/fetchServices");
+      const servicesData = getServices.data.data;
+      setServicesData(servicesData);
+      SuccessHandler({ message: "Fetched Services" });
+    } catch (err) {
+      console.log("Services Error:", err);
+      ErrorHandler({ message: "Error fetching Services" });
+    }
+  };
+
   const getCombinedActiveClientsUniqueMembershipIds = async () => {
     const combinedActiveClientsUniqueMembershipIds = await Promise.all(
       clientsData.map(async (client) => {
@@ -75,10 +145,12 @@ const Home = (props: homeProps) => {
 
   const { columnsData: membershipColumns, rowsData: membershipRowData } = createMembershipTableData(clientsData, membershipsData, activeClientsMemberships);
   const { columnsData: accountBalanceColumns, rowsData: accountBalanceRowData } = createAccountBalance(clientsData);
+  const { columnsData: salesByServicesColumns, rowsData: salesByServicesRowData } = createSalesByServices(salesData, servicesData, salesPeriod);
 
   useEffect(() => {
-    getClientsData();
-    getMembershipsData();
+    // getClientsData();
+    // getMembershipsData();
+    getServicesData();
   }, []);
 
   return (
@@ -92,17 +164,21 @@ const Home = (props: homeProps) => {
       <Button variant="contained" onClick={getCombinedActiveClientsUniqueMembershipIds}>
         GET ACTIVE MEMBERSHIPS
       </Button>
+      <Button variant="contained" onClick={getSalesData}>
+        Get Sales Data
+      </Button>
 
       <Grid item width={"100%"} margin="8px auto">
         <Box>AUTOPAY SUMMARY</Box>
-
-        <Box>SALES BY SERVICE</Box>
       </Grid>
       <Grid item textAlign="center" width={"90%"} margin={"8px auto"}>
         <Table data={[membershipRowData] as simpleObject[]} dynamicColumns={membershipColumns} title={"Membership Report"} />
       </Grid>
       <Grid item textAlign="center" width={"90%"} margin={"8px auto"}>
         <Table data={[accountBalanceRowData] as simpleObject[]} dynamicColumns={accountBalanceColumns} title={"AccountBalance Report"} />
+      </Grid>
+      <Grid item textAlign="center" width={"90%"} margin={"8px auto"}>
+        <Table data={salesByServicesRowData} dynamicColumns={salesByServicesColumns} title={"Sales By Services Report"} loading={salesLoading} />
       </Grid>
     </Grid>
   );
