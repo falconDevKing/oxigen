@@ -87,7 +87,7 @@ const createPeriodicSalesByServices = (salesData: any[], servicesData: any[], st
   };
 };
 
-type salesPeriod = {
+export type salesPeriod = {
   a: string;
   b: string;
 };

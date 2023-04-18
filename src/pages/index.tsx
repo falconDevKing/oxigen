@@ -37,7 +37,9 @@ const Home = (props: homeProps) => {
   const [clientsData, setClientsData] = useState<any[]>([]);
   const [membershipsData, setMembershipsData] = useState<any[]>([]);
   const [salesLoading, setSalesLoading] = useState<boolean>(false);
+  const [accountsBalanceLoading, setAccountsBalanceLoading] = useState<boolean>(false);
   const [salesData, setSalesData] = useState<any[]>([]);
+  const [accountsBalanceData, setAccountsBalanceData] = useState<any[]>([]);
   const [servicesData, setServicesData] = useState<any[]>([]);
   const [activeClientsMemberships, setActiveClientsMemberships] = useState<number[]>([]);
 
@@ -118,6 +120,46 @@ const Home = (props: homeProps) => {
     }
   };
 
+  const getAccountBalancePeriodicData = async (monthEnd: string) => {
+    try {
+      const clientsIds = clientsData
+        .map((client) => client.Id)
+        // .filter((e, i) => i < 100)
+        .join(",");
+      console.log("cid", clientsIds);
+      const getPeriodAccountBalance = await axios.get("/api/fetchAccountBalance", {
+        params: {
+          clientsIds: clientsIds,
+          balanceDate: monthEnd,
+        },
+      });
+      const accountBalancePeriodData = getPeriodAccountBalance.data.data;
+      return accountBalancePeriodData;
+    } catch (err) {
+      console.log("AccountBalance Period Error:", err);
+      ErrorHandler({ message: "Error fetching AccountBalance Period" });
+    }
+  };
+
+  const getAccountBalanceData = async () => {
+    try {
+      setAccountsBalanceLoading(true);
+      const combinedAccountBalanceData = await Promise.allSettled(
+        salesPeriod.map(async (salePeriod) => {
+          const accountBalancePeriodData = await getAccountBalancePeriodicData(salePeriod.b);
+          return accountBalancePeriodData;
+        })
+      );
+      const combinedAccountBalanceDataValues = combinedAccountBalanceData.map((value) => value?.value ?? []);
+      setAccountsBalanceData(combinedAccountBalanceDataValues);
+      SuccessHandler({ message: "Fetched AccountBalance" });
+      setAccountsBalanceLoading(false);
+    } catch (err) {
+      console.log("AccountBalance Error:", err);
+      ErrorHandler({ message: "Error fetching AccountBalance" });
+    }
+  };
+
   const getServicesData = async () => {
     try {
       const getServices = await axios.get("/api/fetchServices");
@@ -144,13 +186,13 @@ const Home = (props: homeProps) => {
   };
 
   const { columnsData: membershipColumns, rowsData: membershipRowData } = createMembershipTableData(clientsData, membershipsData, activeClientsMemberships);
-  const { columnsData: accountBalanceColumns, rowsData: accountBalanceRowData } = createAccountBalance(clientsData);
+  const { columnsData: accountBalanceColumns, rowsData: accountBalanceRowData } = createAccountBalance(accountsBalanceData, salesPeriod);
   const { columnsData: salesByServicesColumns, rowsData: salesByServicesRowData } = createSalesByServices(salesData, servicesData, salesPeriod);
 
   useEffect(() => {
-    // getClientsData();
+    getClientsData();
     // getMembershipsData();
-    getServicesData();
+    // getServicesData();
   }, []);
 
   return (
@@ -167,6 +209,9 @@ const Home = (props: homeProps) => {
       <Button variant="contained" onClick={getSalesData}>
         Get Sales Data
       </Button>
+      <Button variant="contained" onClick={getAccountBalanceData}>
+        Get AccountBalance Data
+      </Button>
 
       <Grid item width={"100%"} margin="8px auto">
         <Box>AUTOPAY SUMMARY</Box>
@@ -175,7 +220,7 @@ const Home = (props: homeProps) => {
         <Table data={[membershipRowData] as simpleObject[]} dynamicColumns={membershipColumns} title={"Membership Report"} />
       </Grid>
       <Grid item textAlign="center" width={"90%"} margin={"8px auto"}>
-        <Table data={[accountBalanceRowData] as simpleObject[]} dynamicColumns={accountBalanceColumns} title={"AccountBalance Report"} />
+        <Table data={accountBalanceRowData} dynamicColumns={accountBalanceColumns} title={"AccountBalance Report"} loading={accountsBalanceLoading} />
       </Grid>
       <Grid item textAlign="center" width={"90%"} margin={"8px auto"}>
         <Table data={salesByServicesRowData} dynamicColumns={salesByServicesColumns} title={"Sales By Services Report"} loading={salesLoading} />
