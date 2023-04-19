@@ -22,6 +22,7 @@ import Head from "next/head";
 import Image from "next/image";
 import DataStatus from "components/dataStatus";
 import { createAutoPay } from "services/autopay";
+import DisplayButton from "components/displayButton";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 const apiKey = process.env.NEXT_PUBLIC_API_KEY;
@@ -223,6 +224,10 @@ const Home = (props: { authToken: string; clientsData: any[]; membershipsData: a
     getCombinedClientsContracts();
   }, [authToken, clientsData, intervals]);
 
+  const setDisplayHandler = (value: string) => {
+    setDisplay(value);
+  };
+
   return (
     <>
       <Head>
@@ -235,24 +240,16 @@ const Home = (props: { authToken: string; clientsData: any[]; membershipsData: a
           </Box>
 
           <Box display={"flex"} flexDirection={"column"} justifyContent={"space-around"} height={"100%"} pt={8} pb={24}>
-            <Button variant="contained" onClick={() => setDisplay("membership")} sx={{ borderRadius: "0 32px 0 32px", background: "#262555", color: "white" }}>
-              MEMBERSHIP REPORT
-            </Button>
-            <Button variant="contained" onClick={() => setDisplay("sales")} sx={{ borderRadius: "0 32px 0 32px", background: "#262555", color: "white" }}>
-              SALES BY SERVICE REPORT
-            </Button>
-            <Button variant="contained" onClick={() => setDisplay("autopay")} sx={{ borderRadius: "0 32px 0 32px", background: "#262555", color: "white" }}>
-              AUTOPAY SUMMARY REPORT
-            </Button>
-            <Button variant="contained" onClick={() => setDisplay("account")} sx={{ borderRadius: "0 32px 0 32px", background: "#262555", color: "white" }}>
-              ACCOUNT BALANCE REPORT
-            </Button>
+            <DisplayButton title={"MEMBERSHIP REPORT"} setText="membership" setDisplay={setDisplayHandler} />
+            <DisplayButton title={"SALES BY SERVICE REPORT"} setText="sales" setDisplay={setDisplayHandler} />
+            <DisplayButton title={"AUTOPAY SUMMARY REPORT"} setText="autopay" setDisplay={setDisplayHandler} />
+            <DisplayButton title={"ACCOUNT BALANCE REPORT"} setText="account" setDisplay={setDisplayHandler} />
           </Box>
         </Grid>
 
         <Grid item md={9} lg={10} width={"100%"} px={8} py={2} margin="0px auto" height="100%">
           <Box textAlign="center">
-            <h1>Welcome to Oxigen Demo Page </h1>
+            <h1>Welcome to Oxigen POC Page </h1>
 
             <h3>Kindly select your report type</h3>
 
