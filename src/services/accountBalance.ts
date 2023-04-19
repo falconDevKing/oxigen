@@ -1,5 +1,5 @@
 import { simpleObject } from "./memberships";
-import { DataGrid, GridColDef, GridRenderCellParams, GridRowSelectionModel, GridValueGetterParams } from "@mui/x-data-grid";
+import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import { period } from "./sales";
 import moment from "moment";
 
