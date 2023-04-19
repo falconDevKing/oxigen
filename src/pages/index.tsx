@@ -226,7 +226,7 @@ const Home = (props: { authToken: string; clientsData: any[]; membershipsData: a
   return (
     <>
       <Head>
-        <title>Oxigen Demo</title>
+        <title>Oxigen POC</title>
       </Head>
       <Grid container height="100vh">
         <Grid item md={3} lg={2} px={4} py={4} margin="0px auto">
