@@ -199,10 +199,10 @@ const Home = (props: { authToken: string; clientsData: any[]; membershipsData: a
       }
     };
 
-    // getCombinedActiveClientsUniqueMembershipIds();
-    // getSalesData();
-    // getAccountBalanceData();
-    // getCombinedClientsContracts();
+    getCombinedActiveClientsUniqueMembershipIds();
+    getSalesData();
+    getAccountBalanceData();
+    getCombinedClientsContracts();
   }, [authToken, clientsData, intervals]);
 
   const setDisplayHandler = (value: string) => {
