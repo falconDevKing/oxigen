@@ -1,30 +1,9 @@
 import * as React from "react";
-// import AWS from "aws-sdk";
+
 import Box from "@mui/material/Box";
-import { DataGrid, GridColDef, GridRenderCellParams, GridRowSelectionModel, GridValueGetterParams } from "@mui/x-data-grid";
-import { format } from "date-fns";
-import SourceIcon from "@mui/icons-material/Source";
-import DownloadFile from "./downloadFIle";
-import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
-import MetadataInfo from "./MetadataInfo";
+import { DataGrid, GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
 import { HeadingTwo } from "components/Typography";
-import LoadingHandler, { DismissHandler } from "utils/LoadingHandler";
-import SuccessHandler from "utils/SuccessHandler";
-import ErrorHandler from "utils/ErrorHandler";
-// import { useMutation, useQueryClient } from "react-query";
 import { simpleObject } from "services/memberships";
-
-// const REGION = process.env.NEXT_PUBLIC_REGION as string;
-// const TABLE = process.env.NEXT_PUBLIC_TABLE || "flunaTextract";
-// const CREDENTIALS = {
-//   accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID as string,
-//   secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY_ID as string,
-// };
-
-// const ddbClient = new AWS.DynamoDB.DocumentClient({
-//   region: REGION,
-//   credentials: CREDENTIALS,
-// });
 
 type tableProps = {
   data: simpleObject[];

@@ -1,4 +1,4 @@
-import axios, { Axios } from "axios";
+import axios from "axios";
 
 const baseUrl = process.env.BASE_URL;
 const apiKey = process.env.API_KEY;

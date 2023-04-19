@@ -1,32 +1,17 @@
-import React, { useRef, useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import type { GetServerSideProps } from "next";
-import { Box, Button, Grid, Typography } from "@mui/material";
-import UploadIcon from "@mui/icons-material/Upload";
-import InputAdornment from "@mui/material/InputAdornment";
-import Input from "components/Input";
-// import { LoadingButton } from "@mui/lab";
-import { useStyles } from "utils/style";
-import SuccessHandler from "utils/SuccessHandler";
-import ErrorHandler from "utils/ErrorHandler";
-import LoadingHandler, { DismissHandler } from "utils/LoadingHandler";
-import { SelectChangeEvent } from "@mui/material/Select";
-import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
-import GroupedSelectInput from "components/GroupedSelect";
+import { Box, Grid } from "@mui/material";
 import Table from "components/Table";
 import axios from "axios";
-import { createMembershipTableData, simpleObject } from "services/memberships";
+import { createMembershipTableData } from "services/memberships";
 import { createAccountBalance } from "services/accountBalance";
 import { createSalesByServices } from "services/sales";
+import { createAutoPay } from "services/autopay";
 import moment from "moment";
 import Head from "next/head";
 import Image from "next/image";
 import DataStatus from "components/dataStatus";
-import { createAutoPay } from "services/autopay";
 import DisplayButton from "components/displayButton";
-
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-const apiKey = process.env.NEXT_PUBLIC_API_KEY;
-const siteId = process.env.NEXT_PUBLIC_SITE_ID;
 
 const Home = (props: { authToken: string; clientsData: any[]; membershipsData: any[]; servicesData: any[] }) => {
   const { authToken, clientsData, membershipsData, servicesData } = props;
@@ -122,7 +107,6 @@ const Home = (props: { authToken: string; clientsData: any[]; membershipsData: a
         return salesPeriodData;
       } catch (err) {
         console.log("Sales Period Error:", err);
-        ErrorHandler({ message: "Error fetching Sales Period" });
       }
     };
 
@@ -141,7 +125,6 @@ const Home = (props: { authToken: string; clientsData: any[]; membershipsData: a
         return accountBalancePeriodData;
       } catch (err) {
         console.log("AccountBalance Period Error:", err);
-        ErrorHandler({ message: "Error fetching AccountBalance Period" });
       }
     };
 
@@ -196,7 +179,6 @@ const Home = (props: { authToken: string; clientsData: any[]; membershipsData: a
         setSalesLoading(false);
       } catch (err) {
         console.log("Sales Error:", err);
-        ErrorHandler({ message: "Error fetching Sales" });
       }
     };
 
@@ -214,14 +196,13 @@ const Home = (props: { authToken: string; clientsData: any[]; membershipsData: a
         setAccountsBalanceLoading(false);
       } catch (err) {
         console.log("AccountBalance Error:", err);
-        ErrorHandler({ message: "Error fetching AccountBalance" });
       }
     };
 
-    getCombinedActiveClientsUniqueMembershipIds();
-    getSalesData();
-    getAccountBalanceData();
-    getCombinedClientsContracts();
+    // getCombinedActiveClientsUniqueMembershipIds();
+    // getSalesData();
+    // getAccountBalanceData();
+    // getCombinedClientsContracts();
   }, [authToken, clientsData, intervals]);
 
   const setDisplayHandler = (value: string) => {
@@ -284,6 +265,8 @@ export default Home;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const serverUrl = process.env.SERVER_URL;
+  const apiKey = process.env.API_KEY;
+  const siteId = process.env.SITE_ID;
 
   const authTokenData = await axios.post(
     "https://api.mindbodyonline.com/public/v6/usertoken/issue",

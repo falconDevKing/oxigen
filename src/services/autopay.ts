@@ -1,6 +1,5 @@
 import moment from "moment";
-import { DataGrid, GridColDef, GridRenderCellParams, GridRowSelectionModel, GridValueGetterParams } from "@mui/x-data-grid";
-import { simpleObject } from "./memberships";
+import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 
 export const createAutoPay = (clientsContracts: any[]) => {
   const contracts = clientsContracts.flat();

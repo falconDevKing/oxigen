@@ -1,6 +1,5 @@
-import dynamic from "next/dynamic";
 import { complexObject, numberObject, simpleObject } from "./memberships";
-import { DataGrid, GridColDef, GridRenderCellParams, GridRowSelectionModel, GridValueGetterParams } from "@mui/x-data-grid";
+import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import moment from "moment";
 
 const filterServicesSales = (salesData: any[]) => {

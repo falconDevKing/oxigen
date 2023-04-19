@@ -1,7 +1,7 @@
 import * as React from "react";
 import type { AppProps } from "next/app";
 import { CacheProvider, EmotionCache } from "@emotion/react";
-import { ThemeProvider, CssBaseline, createTheme } from "@mui/material";
+import { ThemeProvider, CssBaseline } from "@mui/material";
 import { Toaster } from "react-hot-toast";
 
 import "@fontsource/roboto/300.css";
