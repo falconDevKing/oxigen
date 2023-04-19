@@ -235,17 +235,17 @@ const Home = (props: { authToken: string; clientsData: any[]; membershipsData: a
           </Box>
 
           <Box display={"flex"} flexDirection={"column"} justifyContent={"space-around"} height={"100%"} pt={8} pb={24}>
-            <Button variant="contained" onClick={() => setDisplay("membership")} sx={{ borderRadius: "0 32px 0 32px" }}>
+            <Button variant="contained" onClick={() => setDisplay("membership")} sx={{ borderRadius: "0 32px 0 32px", background: "#262555", color: "white" }}>
               MEMBERSHIP REPORT
             </Button>
-            <Button variant="contained" onClick={() => setDisplay("sales")} sx={{ borderRadius: "0 32px 0 32px" }}>
+            <Button variant="contained" onClick={() => setDisplay("sales")} sx={{ borderRadius: "0 32px 0 32px", background: "#262555", color: "white" }}>
               SALES BY SERVICE REPORT
             </Button>
-            <Button variant="contained" onClick={() => setDisplay("account")} sx={{ borderRadius: "0 32px 0 32px" }}>
-              ACCOUNT BALANCE REPORT
-            </Button>
-            <Button variant="contained" onClick={() => setDisplay("autopay")} sx={{ borderRadius: "0 32px 0 32px" }}>
+            <Button variant="contained" onClick={() => setDisplay("autopay")} sx={{ borderRadius: "0 32px 0 32px", background: "#262555", color: "white" }}>
               AUTOPAY SUMMARY REPORT
+            </Button>
+            <Button variant="contained" onClick={() => setDisplay("account")} sx={{ borderRadius: "0 32px 0 32px", background: "#262555", color: "white" }}>
+              ACCOUNT BALANCE REPORT
             </Button>
           </Box>
         </Grid>
