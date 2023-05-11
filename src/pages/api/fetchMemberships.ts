@@ -3,11 +3,6 @@ import Axios from "utils/axiosInstance";
 import axios from "axios";
 import { success, error } from "utils/responseFormat";
 
-const baseUrl = process.env.BASE_URL;
-const apiKey = process.env.API_KEY;
-const siteId = process.env.SITE_ID;
-const authToken = process.env.STAFF_AUTH_TOKEN;
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     try {

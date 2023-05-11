@@ -10,28 +10,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const offsetMax = 200;
       let offsetValue = 0;
 
-      let clientData: any[] = [];
+      let clientData;
 
-      const fetchclientContractsData = async () => {
-        const fetchedClientContractsDataSet = await Axios.get("client/clientcontracts", {
+      const fetchCompleteClientInfoData = async () => {
+        const fetchedCompleteClientInfoDataSet = await Axios.get("client/clientcompleteinfo", {
           params: { limit: 200, offset: offsetValue, ...req.query },
           headers: { Authorization: authToken },
         });
-        const clients = fetchedClientContractsDataSet.data.Contracts;
-        const requestedOffset = fetchedClientContractsDataSet.data.PaginationResponse.RequestedOffset;
-        const pageSize = fetchedClientContractsDataSet.data.PaginationResponse.PageSize;
-        const nextOffset = requestedOffset + pageSize;
-        const totalResultSize = fetchedClientContractsDataSet.data.PaginationResponse.TotalResults;
+        clientData = fetchedCompleteClientInfoDataSet.data;
+        // const requestedOffset = fetchedCompleteClientInfoDataSet.data.PaginationResponse.RequestedOffset;
+        // const pageSize = fetchedCompleteClientInfoDataSet.data.PaginationResponse.PageSize;
+        // const nextOffset = requestedOffset + pageSize;
+        // const totalResultSize = fetchedCompleteClientInfoDataSet.data.PaginationResponse.TotalResults;
 
-        clientData = [...clientData, ...clients];
+        // clientData = [...clientData, ...clients];
 
-        if (nextOffset < totalResultSize) {
-          offsetValue = nextOffset;
-          await fetchclientContractsData();
-        }
+        // if (nextOffset < totalResultSize) {
+        //   offsetValue = nextOffset;
+        //   await fetchCompleteClientInfoData();
+        // }
       };
 
-      await fetchclientContractsData();
+      await fetchCompleteClientInfoData();
 
       const successResponse = success(200, "FetchClientsContracts", clientData);
       res.status(successResponse.status).json(successResponse);
